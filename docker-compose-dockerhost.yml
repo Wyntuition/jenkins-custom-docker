@@ -1,0 +1,11 @@
+version: '3'
+services:
+  jenkins:
+    container_name: jenkins-docktools
+    image: jenkins-docktools:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      #- /Users/devuser/dev/docker/volumes/jenkins:/var/jenkins_home
+      - /Users/wbvandev/dev/docker/volumes/jenkins:/var/jenkins_home
+      - /var/run:/var/run:rw

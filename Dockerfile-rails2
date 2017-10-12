@@ -1,0 +1,32 @@
+FROM jenkins/jenkins:lts
+
+USER root
+
+RUN apt-get update
+RUN apt-get install wget vim git --assume-yes
+
+# install RVM
+RUN apt-get install build-essential curl --assume-yes
+RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+RUN curl -L https://get.rvm.io | bash -s stable
+RUN echo 'source /etc/profile.d/rvm.sh' >> ~/.bashrc
+RUN /usr/local/rvm/bin/rvm-shell -c "rvm requirements"
+
+# install Ruby
+RUN /bin/bash -l -c "rvm autolibs enable"
+RUN /bin/bash -l -c "rvm install 2.1.2"
+
+# install Rails
+RUN echo "gem: --no-rdoc --no-ri" >> ~/.gemrc
+RUN /bin/bash -l -c "gem install rails -v 4.1.5"
+
+ENV CONTAINER_INIT /usr/local/bin/init-container
+RUN echo '#!/usr/bin/env bash' > $CONTAINER_INIT ; chmod +x $CONTAINER_INIT
+
+RUN gem install bundler
+RUN bundle config --global path /cache/
+RUN echo 'bundle config --global jobs $(cat /proc/cpuinfo | grep -c processor)' >> $CONTAINER_INIT
+RUN gem install rubygems-update && update_rubygems
+ENV BUNDLE_GEMFILE /workspace/Gemfile
+
+RUN echo 'Xvfb :0 -ac -screen 0 1024x768x24 >/dev/null 2>&1 &' >> $CONTAINER_INIT
