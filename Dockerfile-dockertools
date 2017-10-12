@@ -9,4 +9,4 @@ RUN echo deb https://apt.dockerproject.org/repo debian-jessie main > /etc/apt/so
 RUN apt-get update -qq
 RUN apt-get install -qqy docker-engine
  
-USER jenkins
+#USER jenkins
